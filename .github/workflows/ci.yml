@@ -1,7 +1,7 @@
 name: CI (PHPCS)
+
 on:
   push:
-    branches: [ main, master ]
   pull_request:
 
 jobs:
@@ -9,11 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Installa PHP e il tool 'phpcs' (niente Composer)
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
-          tools: composer
-      - name: Install dev deps
-        run: composer install --no-interaction --no-progress
+          tools: phpcs
+
+      # Clona gli standard WordPress nel percorso atteso
+      - name: Fetch WPCS
+        run: |
+          mkdir -p vendor/wp-coding-standards
+          git clone --depth=1 https://github.com/WordPress/WordPress-Coding-Standards.git vendor/wp-coding-standards/wpcs
+          phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs
+
+      # Esegue PHPCS. Caricherà automaticamente phpcs.xml(.dist) se presente
       - name: Run PHPCS
-        run: vendor/bin/phpcs
+        run: phpcs
