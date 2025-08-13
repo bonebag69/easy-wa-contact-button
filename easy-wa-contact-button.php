@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Easy WA Contact Button — WhatsApp Contact/Booking
  * Description:       Crea un pulsante/form per inviare richieste via WhatsApp (B&B, escursioni, musei, noleggi).
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Marco Bellu
  * Text Domain:       easy-wa-contact-button
  * Domain Path:       /languages
@@ -219,3 +219,4 @@ final class EWA_Plugin {
 }
 
 new EWA_Plugin();
+
