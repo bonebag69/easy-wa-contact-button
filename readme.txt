@@ -2,9 +2,9 @@
 Contributors: marcobellu
 Tags: whatsapp, wa, contact, booking, tourism, b&b, excursion, button
 Requires at least: 6.0
-Tested up to: 6.5
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,3 +86,4 @@ On desktop it opens WhatsApp Desktop or WhatsApp Web (if available). On mobile i
 == Upgrade Notice ==
 = 1.0.0 =
 Initial release.
+
