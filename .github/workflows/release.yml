@@ -2,22 +2,23 @@ name: Build & Release ZIP
 
 on:
   push:
-    tags: ['v*']
-  release:
-    types: [published]
-  workflow_dispatch:
+    tags: ['v*']      # es. v1.0.1
+  workflow_dispatch:  # avvio manuale (utile per test)
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # <-- QUESTO È FONDAMENTALE
+      contents: write        # necessario per creare la release
+
+    env:
+      PLUGIN: easy-wa-contact-button
 
     steps:
       - uses: actions/checkout@v4
-      - name: Build plugin structure
+
+      - name: Build plugin zip
         run: |
-          PLUGIN=easy-wa-contact-button
           mkdir -p dist/$PLUGIN
           rsync -a --delete \
             --exclude='.git' \
@@ -31,17 +32,25 @@ jobs:
           cd dist
           zip -r ${PLUGIN}-${GITHUB_REF_NAME}.zip $PLUGIN
 
-      - name: Attach to release (on tag)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*.zip
+      # CREA la release (non la aggiorna)
+      - name: Create GitHub release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifact (manual run)
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v4
         with:
-          name: plugin-zip
-          path: dist/*.zip
+          tag_name: ${{ github.ref_name }}      # es. v1.0.1
+          release_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      # CARICA lo zip come asset della release appena creata
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/${{ env.PLUGIN }}-${{ github.ref_name }}.zip
+          asset_name: ${{ env.PLUGIN }}-${{ github.ref_name }}.zip
+          asset_content_type: application/zip
