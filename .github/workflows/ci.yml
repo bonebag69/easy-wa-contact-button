@@ -1,0 +1,19 @@
+name: CI (PHPCS)
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+      - name: Install dev deps
+        run: composer install --no-interaction --no-progress
+      - name: Run PHPCS
+        run: vendor/bin/phpcs
