@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: write
     env:
-      PLUGIN: easy-wa-contact-button
+      PLUGIN: chat2book-button   # <<< usa il nuovo slug del plugin
     steps:
       - uses: actions/checkout@v4
       - name: Build plugin zip
@@ -27,7 +27,6 @@ jobs:
             ./ dist/$PLUGIN/
           cd dist
           zip -r ${PLUGIN}-${GITHUB_REF_NAME}.zip $PLUGIN
-
       - name: Create/Update GitHub release and upload asset
         uses: softprops/action-gh-release@v2
         with:
