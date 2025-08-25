@@ -1,54 +1,25 @@
 name: Build & Release ZIP
-
 on:
-  push:
-    tags: ['v*']             # es. v1.0.3
   release:
-    types: [published]       # se pubblichi la release dalla UI
-  workflow_dispatch:         # avvio manuale: produrrà solo un artifact
+    types: [published]
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    env:
-      PLUGIN: chat2book-button
-
+    permissions: { contents: write }
+    env: { PLUGIN: chat2book-button }
     steps:
       - uses: actions/checkout@v4
-
       - name: Build plugin zip
         run: |
-          set -e
           mkdir -p dist/$PLUGIN
-          rsync -a --delete \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='dist' \
-            --exclude='.DS_Store' \
-            --exclude='node_modules' \
-            --exclude='vendor' \
-            --exclude='*.zip' \
+          rsync -a --delete --exclude='.git' --exclude='.github' --exclude='dist' \
+            --exclude='.DS_Store' --exclude='node_modules' --exclude='vendor' --exclude='*.zip' \
             ./ dist/$PLUGIN/
-          cd dist
-          zip -r ${PLUGIN}-${GITHUB_REF_NAME}.zip $PLUGIN
-          ls -lh
-
-      # Allego alla release (sia da tag push che da release UI)
-      - name: Create/Update GitHub release and upload asset
-        if: ${{ github.event_name != 'workflow_dispatch' }}
+          cd dist && zip -r ${PLUGIN}-${GITHUB_REF_NAME}.zip $PLUGIN
+      - name: Create/Update release + upload asset
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Se avviato manualmente, almeno carico lo zip come artifact
-      - name: Upload artifact (manual run)
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: plugin-zip
-          path: dist/*.zip
